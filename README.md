@@ -1,5 +1,5 @@
 ---
-title: {"Sparrow Agent"}
+title: Sparrow Agent
 colorFrom: green
 colorTo: red
 sdk: docker
