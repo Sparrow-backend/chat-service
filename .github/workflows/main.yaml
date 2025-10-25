@@ -33,7 +33,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_USERNAME: nivakaran
-          HF_SPACE: sparrowagenticai
+          HF_SPACE: sparrowAgentNew
         run: |
           git branch -M main
           git push https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/$HF_USERNAME/$HF_SPACE main --force
