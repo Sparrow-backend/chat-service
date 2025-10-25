@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparrow Agent Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .chat-header .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 8px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 16px;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+            transition: all 0.2s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4f46e5;
+            animation: loadingPulse 1.4s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loadingPulse {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .status-info {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                width: 95%;
+                height: 90vh;
+                border-radius: 15px;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .chat-input-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Sparrow Logistics Agent</h1>
+            <div class="subtitle">Your Intelligent Assistant</div>
+        </div>
+        
+        <div class="chat-messages" id="messages">
+            <div class="message ai">
+                <div class="message-content">
+                    <div>Hello! I'm Sparrow, your intelligent assistant. I can help you with various tasks and questions. What would you like to know or do today?</div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <form class="chat-input-form" id="chatForm">
+                <textarea 
+                    class="chat-input" 
+                    id="messageInput" 
+                    placeholder="Type your message here..." 
+                    rows="1"
+                    required
+                ></textarea>
+                <button type="submit" class="send-button" id="sendButton">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+
+        // Handle Enter key (Shift+Enter for new line)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        function addMessage(content, isUser = false, showTime = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div>${content}</div>
+                    ${showTime ? `<div class="message-time">${currentTime}</div>` : ''}
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+
+        function showLoading() {
+            return addMessage(`
+                <div class="loading">
+                    <span>Sparrow is thinking</span>
+                    <div class="loading-dots">
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                        <div class="loading-dot"></div>
+                    </div>
+                </div>
+            `, false, false);
+        }
+
+        function setButtonState(loading) {
+            sendButton.disabled = loading;
+            sendButton.textContent = loading ? 'Sending...' : 'Send';
+            messageInput.disabled = loading;
+        }
+
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            // Show loading
+            setButtonState(true);
+            const loadingMessage = showLoading();
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                // Remove loading message
+                loadingMessage.remove();
+                
+                if (data.success) {
+                    // Add AI response
+                    let responseContent = data.response;
+                    if (data.status) {
+                        responseContent += `<div class="status-info">${data.status}</div>`;
+                    }
+                    addMessage(responseContent);
+                } else {
+                    addMessage(`<div class="error-message">Sorry, I encountered an error: ${data.error}</div>`);
+                }
+                
+            } catch (error) {
+                loadingMessage.remove();
+                addMessage(`<div class="error-message">Sorry, I couldn't connect to the server. Please try again.</div>`);
+                console.error('Error:', error);
+            } finally {
+                setButtonState(false);
+                messageInput.focus();
+            }
+        });
+
+        // Focus input on load
+        messageInput.focus();
+    </script>
+</body>
+</html>
