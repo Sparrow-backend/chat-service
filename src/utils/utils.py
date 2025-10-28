@@ -17,13 +17,13 @@ from src.llms.groqllm import GroqLLM
 logger = logging.getLogger(__name__)
 
 # Configuration for MongoDB
-MONGODB_URI = os.getenv("MONGODB_URI", None)
-MONGODB_DATABASE = os.getenv("MONGODB_DATABASE", "parcel_tracking")
+MONGODB_URI = os.getenv("MONGODB_URI", "mongodb+srv://nivakaran:Pk3XVsGvtqcVDf04@cluster0.6yoqtds.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGODB_DATABASE = os.getenv("MONGODB_DATABASE", "test")
 MONGODB_COLLECTION = os.getenv("MONGODB_COLLECTION", "parcels")
 MONGODB_TIMEOUT = int(os.getenv("MONGODB_TIMEOUT", "5000"))  # milliseconds
 
 # Configuration for ETA API
-ETA_API_BASE_URL = os.getenv("ETA_API_BASE_URL", "http://localhost:8000")
+ETA_API_BASE_URL = os.getenv("ETA_API_BASE_URL", "https://nivakaran-eta-service.hf.space")
 ETA_API_TIMEOUT = int(os.getenv("ETA_API_TIMEOUT", "10"))  # seconds
 
 # MongoDB client singleton

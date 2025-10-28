@@ -7,8 +7,10 @@ import threading
 import time
 from src.graphs.finalAgentGraph import sparrowAgent
 from langchain_core.messages import HumanMessage, AIMessage
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-secret-key-here')
 
 logging.basicConfig(level=logging.INFO)

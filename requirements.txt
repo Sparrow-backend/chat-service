@@ -15,3 +15,5 @@ requests
 pymongo
 uuid
 gradio
+flask_cors
+gunicorn

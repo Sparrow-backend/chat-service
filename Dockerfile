@@ -25,4 +25,4 @@ COPY --chown=user . /app
 EXPOSE 7860
 
 # Run the application
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:7860", "app:app"]

@@ -29,7 +29,6 @@ class ExecutorGraphBuilder:
         self.graph.add_node("tool_node", self.executor_node_obj.tool_node)
         self.graph.add_node("compress_execution", self.executor_node_obj.compress_execution)
 
-        # Flow
         self.graph.add_edge(START, "llm_call")
         self.graph.add_conditional_edges(
             "llm_call",
@@ -50,6 +49,6 @@ class ExecutorGraphBuilder:
 
 llm=GroqLLM().get_llm()
 
-## Creating the graph
+
 graph_builder=ExecutorGraphBuilder(llm)
 graph=graph_builder.build_executor_graph().compile()

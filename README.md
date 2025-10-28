@@ -1,8 +1,8 @@
 ---
 title: Sparrow Agent
-colorFrom: green
-colorTo: red
+emoji: 🌖
+colorFrom: red
+colorTo: indigo
 sdk: docker
-app_file: app.py
 pinned: false
 ---
